@@ -4,13 +4,15 @@ int grid_x = 0;
 int grid_y = 0;
 int cell_width = 4;
 int cell_height = 4;
+//out of time! forget how to set a real color!
+color waveColor = 40;
 
 void setup() {
   size(800, 450);
 
   int rows = 111;
   int cols = 198;
-  grid = new WaveGrid(rows, cols);
+  grid = new WaveGrid(rows, cols, waveColor);
   grid.setDamping(0.001);
   noStroke();
 }
@@ -29,6 +31,7 @@ void draw() {
 
   background(0);
   grid.update();
+  fill(grid.getColor());
   
   for (int r = 1; r <= grid.rows; r++) {
     for (int c = 1; c <= grid.cols; c++) {
@@ -47,19 +50,26 @@ class WaveGrid {
   int rows, cols;
   float[][] positions;
   float[][] velocities;
-  
+  color myColor;
   float damping; // Reduces overall energy.
   float wave_force; // Kind of controls wave speed.
   
-  WaveGrid(int r, int c) {
+  WaveGrid(int r, int c, color theColor) {
     rows = r;
     cols = c;
+    color myColor = theColor;
     positions = new float[rows + 2][cols + 2]; // +2 for borders
     velocities = new float[rows + 2][cols + 2]; // +2 for borders
     
     damping = 0.0;
     wave_force = 0.1;
+
   }
+      public color getColor()
+    {
+      return myColor;
+    }
+  
   
   void setDamping(float d) {
     damping = d;
