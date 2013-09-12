@@ -1,4 +1,6 @@
+import java.util.Iterator;
 WaveGrid grid;
+System system;
 
 int grid_x = 0;
 int grid_y = 0;
@@ -15,6 +17,8 @@ void setup() {
   grid = new WaveGrid(rows, cols, waveColor);
   grid.setDamping(0.001);
   noStroke();
+  frameRate(10);
+  system = new System();
 }
 
 void keyPressed() {
@@ -25,14 +29,18 @@ void mouseMoved() {
   int mouse_row = (mouseY - grid_y) / cell_height;
   int mouse_col = (mouseX - grid_x) / cell_width;
   grid.impulseCell(mouse_row, mouse_col, 0.1);
+  
+  if (random(0, 1) > 0.5) {
+    system.points.add(new Point(mouseX, mouseY));
+  }
 }
 
 void draw() {
 
   background(0);
+  system.update();
   grid.update();
   fill(grid.getColor());
-  
   for (int r = 1; r <= grid.rows; r++) {
     for (int c = 1; c <= grid.cols; c++) {
       float wid = cell_width * grid.positions[r][c];
@@ -43,6 +51,40 @@ void draw() {
         rect(grid_x + c * cell_width - wid / 2, grid_y + r * cell_height - hei / 2, cell_width, cell_height);
       }
     }
+  }
+  
+}
+
+class Point {
+  int x, y, life;
+  public Point(int _x, int _y) {
+    x = _x;
+    y = _y;
+    life = 500;
+  }
+}
+class System {
+  ArrayList<Point> points;
+  
+  public System() {
+    points = new ArrayList<Point>();
+  }
+  void update() {
+    Iterator<Point> it = points.iterator();
+    pushStyle();
+    beginShape();
+    stroke(random(0, 255), random(0, 255), random(0, 255));
+    while(it.hasNext()) {
+      Point p = it.next();
+      p.life -= 1;
+      if (p.life > 0) {
+        vertex(p.x, p.y);
+      } else {
+        it.remove();
+      }
+    }
+    endShape();
+    popStyle();
   }
 }
 
