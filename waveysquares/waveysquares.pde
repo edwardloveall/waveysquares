@@ -7,7 +7,7 @@ int grid_y = 0;
 int cell_width = 4;
 int cell_height = 4;
 //out of time! forget how to set a real color!
-color waveColor = 40;
+color waveColor = color(240, 40, 40);
 
 void setup() {
   size(800, 450);
@@ -22,14 +22,14 @@ void setup() {
 }
 
 void keyPressed() {
-  grid.bloop(); 
+  grid.bloop();
 }
 
 void mouseMoved() {
   int mouse_row = (mouseY - grid_y) / cell_height;
   int mouse_col = (mouseX - grid_x) / cell_width;
   grid.impulseCell(mouse_row, mouse_col, 0.1);
-  
+
   if (random(0, 1) > 0.5) {
     system.points.add(new Point(mouseX, mouseY));
   }
@@ -45,14 +45,17 @@ void draw() {
     for (int c = 1; c <= grid.cols; c++) {
       float wid = cell_width * grid.positions[r][c];
       float hei = cell_height * grid.positions[r][c];
-      float col = 255 * grid.positions[r][c];
-      if (col >= 0) {
-        fill(col);
+      float colR = (frameCount % 255) * grid.positions[r][c];
+      float colG = (frameCount % 80) * grid.positions[r][c] + 100;
+      float colB = (frameCount % 127) * grid.positions[r][c] + 70;
+
+      if (colR >= 0) {
+        fill(colR, colG, colB);
         rect(grid_x + c * cell_width - wid / 2, grid_y + r * cell_height - hei / 2, cell_width, cell_height);
       }
     }
   }
-  
+
 }
 
 class Point {
@@ -65,7 +68,7 @@ class Point {
 }
 class System {
   ArrayList<Point> points;
-  
+
   public System() {
     points = new ArrayList<Point>();
   }
@@ -95,14 +98,14 @@ class WaveGrid {
   color myColor;
   float damping; // Reduces overall energy.
   float wave_force; // Kind of controls wave speed.
-  
+
   WaveGrid(int r, int c, color theColor) {
     rows = r;
     cols = c;
     color myColor = theColor;
     positions = new float[rows + 2][cols + 2]; // +2 for borders
     velocities = new float[rows + 2][cols + 2]; // +2 for borders
-    
+
     damping = 0.0;
     wave_force = 0.1;
 
@@ -111,17 +114,17 @@ class WaveGrid {
     {
       return myColor;
     }
-  
-  
+
+
   void setDamping(float d) {
     damping = d;
   }
-  
+
   void impulseCell(int r, int c, float impulse) {
     if (r > 0 && r <= rows && c > 0 && c <= cols)
       velocities[r][c] += impulse;
   }
-  
+
   void update() {
     // Update velocities.
     for (int r = 1; r <= rows; r++) {
@@ -132,7 +135,7 @@ class WaveGrid {
         velocities[r][c] *= (1 - damping);
       }
     }
-    
+
     // Update positions.
     for (int r = 1; r <= rows; r++) {
       for (int c = 1; c <= cols; c++) {
@@ -140,19 +143,19 @@ class WaveGrid {
       }
     }
   }
-  
+
   void bloop() {
     float edge_value = 0.0;
     if (positions[0][0] == 0)
       edge_value = 0.5;
-      
+
     for (int r = 0; r < rows; r++) {
-      positions[r][0] = edge_value; 
-      positions[r][cols + 1] = edge_value; 
+      positions[r][0] = edge_value;
+      positions[r][cols + 1] = edge_value;
     }
     for (int c = 0; c < cols; c++) {
-      positions[0][c] = edge_value; 
-      positions[rows + 1][c] = edge_value; 
+      positions[0][c] = edge_value;
+      positions[rows + 1][c] = edge_value;
     }
   }
 }
